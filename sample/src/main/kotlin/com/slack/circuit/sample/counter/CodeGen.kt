@@ -48,7 +48,6 @@ class CounterUiFactory @Inject constructor() : Ui.Factory {
             Counter(state, eventSink)
           }
         )
-
       else -> null
     }
   }

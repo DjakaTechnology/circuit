@@ -26,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
@@ -35,7 +36,6 @@ import com.slack.circuit.CircuitUiEvent
 import com.slack.circuit.CircuitUiState
 import com.slack.circuit.EventCollector
 import com.slack.circuit.Screen
-import com.slack.circuit.retained.rememberRetained
 import com.slack.circuit.sample.counter.CounterScreen.CounterEvent
 import com.slack.circuit.sample.counter.CounterScreen.CounterState
 import kotlinx.coroutines.flow.Flow
@@ -53,16 +53,16 @@ object CounterScreen : Screen {
 @CircuitInject<CounterScreen>
 @Composable
 fun CounterPresenter(events: Flow<CounterEvent>): CounterState {
-  var state by rememberRetained { mutableStateOf(CounterState(0)) }
+  var count by rememberSaveable { mutableStateOf(0) }
 
   EventCollector(events) { event ->
     when (event) {
-      is CounterEvent.Increment -> state = state.copy(count = state.count + 1)
-      is CounterEvent.Decrement -> state = state.copy(count = state.count - 1)
+      is CounterEvent.Increment -> count++
+      is CounterEvent.Decrement -> count--
     }
   }
 
-  return state
+  return CounterState(count)
 }
 
 @CircuitInject<CounterScreen>
@@ -79,15 +79,11 @@ fun Counter(state: CounterState, eventSink: (CounterEvent) -> Unit) {
       Button(
         modifier = Modifier.align(CenterHorizontally),
         onClick = { eventSink(CounterEvent.Increment) }
-      ) {
-        Text(text = "Increment +")
-      }
+      ) { Text(text = "Increment +") }
       Button(
         modifier = Modifier.align(CenterHorizontally),
         onClick = { eventSink(CounterEvent.Decrement) }
-      ) {
-        Text(text = "Decrement -")
-      }
+      ) { Text(text = "Decrement -") }
     }
   }
 }
