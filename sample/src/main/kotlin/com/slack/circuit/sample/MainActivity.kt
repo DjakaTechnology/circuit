@@ -28,9 +28,9 @@ import com.slack.circuit.NavigableCircuitContent
 import com.slack.circuit.backstack.rememberSaveableBackStack
 import com.slack.circuit.push
 import com.slack.circuit.rememberCircuitNavigator
+import com.slack.circuit.sample.counter.CounterScreen
 import com.slack.circuit.sample.di.ActivityKey
 import com.slack.circuit.sample.di.AppScope
-import com.slack.circuit.sample.home.HomeScreen
 import com.slack.circuit.sample.ui.StarTheme
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -50,7 +50,7 @@ constructor(
       StarTheme {
         // TODO why isn't the windowBackground enough so we don't need to do this?
         Surface(color = MaterialTheme.colorScheme.background) {
-          val backstack = rememberSaveableBackStack { push(HomeScreen) }
+          val backstack = rememberSaveableBackStack { push(CounterScreen) }
           val navigator =
             rememberCircuitNavigator(backstack, onBackPressedDispatcher::onBackPressed)
           CircuitCompositionLocals(circuitConfig) { NavigableCircuitContent(navigator, backstack) }

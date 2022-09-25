@@ -165,3 +165,23 @@ interface Presenter<UiState : CircuitUiState> {
     fun create(screen: Screen, navigator: Navigator): Presenter<*>?
   }
 }
+
+/**
+ * Due to this bug in Studio, we can't write lambda impls of [Presenter] directly. This works around
+ * it by offering a shim function of the same name. Once it's fixed, we can remove this and make
+ * [Presenter] a fun interface instead.
+ *
+ * Bug: https://issuetracker.google.com/issues/240292828
+ *
+ * @see [Presenter] for main docs.
+ */
+inline fun <UiState : CircuitUiState, UiEvent : CircuitUiEvent> presenterOf(
+  crossinline body: @Composable (events: Flow<UiEvent>) -> UiState
+): Presenter<UiState, UiEvent> {
+  return object : Presenter<UiState, UiEvent> {
+    @Composable
+    override fun present(events: Flow<UiEvent>): UiState {
+      return body(events)
+    }
+  }
+}
