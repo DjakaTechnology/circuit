@@ -30,9 +30,9 @@ annotation class CircuitInject<T : Screen>
 
 @ContributesMultibinding(AppScope::class)
 class CounterPresenterFactory @Inject constructor() : Presenter.Factory {
-  override fun create(screen: Screen, navigator: Navigator): Presenter<*, *>? {
+  override fun create(screen: Screen, navigator: Navigator): Presenter<*>? {
     return when (screen) {
-      is CounterScreen -> presenterOf { events -> CounterPresenter(events) }
+      is CounterScreen -> presenterOf { CounterPresenter() }
       else -> null
     }
   }
@@ -42,12 +42,7 @@ class CounterPresenterFactory @Inject constructor() : Presenter.Factory {
 class CounterUiFactory @Inject constructor() : Ui.Factory {
   override fun create(screen: Screen): ScreenUi? {
     return when (screen) {
-      is CounterScreen ->
-        ScreenUi(
-          ui<CounterScreen.CounterState, CounterScreen.CounterEvent> { state, eventSink ->
-            Counter(state, eventSink)
-          }
-        )
+      is CounterScreen -> ScreenUi(ui<CounterScreen.CounterState> { state -> Counter(state) })
       else -> null
     }
   }

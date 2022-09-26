@@ -175,13 +175,13 @@ interface Presenter<UiState : CircuitUiState> {
  *
  * @see [Presenter] for main docs.
  */
-inline fun <UiState : CircuitUiState, UiEvent : CircuitUiEvent> presenterOf(
-  crossinline body: @Composable (events: Flow<UiEvent>) -> UiState
-): Presenter<UiState, UiEvent> {
-  return object : Presenter<UiState, UiEvent> {
+inline fun <UiState : CircuitUiState> presenterOf(
+  crossinline body: @Composable () -> UiState
+): Presenter<UiState> {
+  return object : Presenter<UiState> {
     @Composable
-    override fun present(events: Flow<UiEvent>): UiState {
-      return body(events)
+    override fun present(): UiState {
+      return body()
     }
   }
 }

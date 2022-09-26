@@ -20,7 +20,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,19 +35,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
 import com.slack.circuit.CircuitUiEvent
 import com.slack.circuit.CircuitUiState
-import com.slack.circuit.EventCollector
 import com.slack.circuit.Screen
 import com.slack.circuit.sample.counter.CounterScreen.CounterEvent
 import com.slack.circuit.sample.counter.CounterScreen.CounterState
-import kotlinx.coroutines.flow.Flow
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
 object CounterScreen : Screen {
-  data class CounterState(val count: Int) : CircuitUiState
+  data class CounterState(
+    val count: Int,
+    val eventSink: (CounterEvent) -> Unit,
+  ) : CircuitUiState
   interface CounterEvent : CircuitUiEvent {
     object Increment : CounterEvent
     object Decrement : CounterEvent
@@ -52,22 +58,20 @@ object CounterScreen : Screen {
 
 @CircuitInject<CounterScreen>
 @Composable
-fun CounterPresenter(events: Flow<CounterEvent>): CounterState {
+fun CounterPresenter(): CounterState {
   var count by rememberSaveable { mutableStateOf(0) }
 
-  EventCollector(events) { event ->
+  return CounterState(count) { event ->
     when (event) {
       is CounterEvent.Increment -> count++
       is CounterEvent.Decrement -> count--
     }
   }
-
-  return CounterState(count)
 }
 
 @CircuitInject<CounterScreen>
 @Composable
-fun Counter(state: CounterState, eventSink: (CounterEvent) -> Unit) {
+fun Counter(state: CounterState) {
   Box(Modifier.fillMaxSize()) {
     Column(Modifier.align(Alignment.Center)) {
       Text(
@@ -78,12 +82,12 @@ fun Counter(state: CounterState, eventSink: (CounterEvent) -> Unit) {
       Spacer(modifier = Modifier.height(16.dp))
       Button(
         modifier = Modifier.align(CenterHorizontally),
-        onClick = { eventSink(CounterEvent.Increment) }
-      ) { Text(text = "Increment +") }
+        onClick = { state.eventSink(CounterEvent.Increment) }
+      ) { Icon(rememberVectorPainter(Icons.Filled.Add), "Increment") }
       Button(
         modifier = Modifier.align(CenterHorizontally),
-        onClick = { eventSink(CounterEvent.Decrement) }
-      ) { Text(text = "Decrement -") }
+        onClick = { state.eventSink(CounterEvent.Decrement) }
+      ) { Icon(rememberVectorPainter(Icons.Filled.Remove), "Decrement") }
     }
   }
 }
