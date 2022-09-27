@@ -98,12 +98,12 @@ fun Counter(state: CounterState) {
 
 @Preview(showBackground = true)
 @Composable
-fun CounterPreview() {
+private fun CounterPreview() {
   Counter(CounterState(0))
 }
 
 @Preview(showBackground = true)
 @Composable
-fun CounterPreviewNegative() {
+private fun CounterPreviewNegative() {
   Counter(CounterState(-1))
 }
