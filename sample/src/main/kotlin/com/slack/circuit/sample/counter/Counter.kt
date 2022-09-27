@@ -50,7 +50,7 @@ object CounterScreen : Screen {
     val count: Int,
     val eventSink: (CounterEvent) -> Unit,
   ) : CircuitUiState
-  interface CounterEvent : CircuitUiEvent {
+  sealed interface CounterEvent : CircuitUiEvent {
     object Increment : CounterEvent
     object Decrement : CounterEvent
   }
