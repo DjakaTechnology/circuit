@@ -35,7 +35,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.slack.circuit.CircuitUiEvent
 import com.slack.circuit.CircuitUiState
@@ -48,7 +50,7 @@ import kotlinx.parcelize.Parcelize
 object CounterScreen : Screen {
   data class CounterState(
     val count: Int,
-    val eventSink: (CounterEvent) -> Unit,
+    val eventSink: (CounterEvent) -> Unit = {},
   ) : CircuitUiState
   sealed interface CounterEvent : CircuitUiEvent {
     object Increment : CounterEvent
@@ -72,12 +74,14 @@ fun CounterPresenter(): CounterState {
 @CircuitInject<CounterScreen>
 @Composable
 fun Counter(state: CounterState) {
+  val color = if (state.count >= 0) Color.Unspecified else MaterialTheme.colorScheme.error
   Box(Modifier.fillMaxSize()) {
     Column(Modifier.align(Alignment.Center)) {
       Text(
         modifier = Modifier.align(CenterHorizontally),
         text = "Count: ${state.count}",
-        style = MaterialTheme.typography.displayLarge
+        style = MaterialTheme.typography.displayLarge,
+        color = color
       )
       Spacer(modifier = Modifier.height(16.dp))
       Button(
@@ -90,4 +94,16 @@ fun Counter(state: CounterState) {
       ) { Icon(rememberVectorPainter(Icons.Filled.Remove), "Decrement") }
     }
   }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun CounterPreview() {
+  Counter(CounterState(0))
+}
+
+@Preview(showBackground = true)
+@Composable
+fun CounterPreviewNegative() {
+  Counter(CounterState(-1))
 }
